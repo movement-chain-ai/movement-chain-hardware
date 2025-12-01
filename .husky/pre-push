@@ -1,0 +1,37 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🚀 Running pre-push validation for hardware..."
+
+# Check if kicad-cli is installed
+if command -v kicad-cli > /dev/null; then
+  echo "Running KiCad checks..."
+
+  # Run ERC on schematic files
+  for sch in *.kicad_sch; do
+    if [ -f "$sch" ]; then
+      echo "Running ERC on $sch..."
+      kicad-cli sch erc "$sch" || echo "⚠️  ERC warnings found in $sch (non-blocking)"
+    fi
+  done
+
+  # Run DRC on PCB files
+  for pcb in *.kicad_pcb; do
+    if [ -f "$pcb" ]; then
+      echo "Running DRC on $pcb..."
+      kicad-cli pcb drc "$pcb" || echo "⚠️  DRC warnings found in $pcb (non-blocking)"
+    fi
+  done
+else
+  echo "⚠️  kicad-cli not installed, skipping design rule checks"
+  echo "Install KiCad 7+ to enable automated checks"
+fi
+
+# Check for BOM file
+if ls BOM.* bom.* 1> /dev/null 2>&1; then
+  echo "✅ BOM file found"
+else
+  echo "⚠️  No BOM file found"
+fi
+
+echo "✅ Pre-push validation completed"

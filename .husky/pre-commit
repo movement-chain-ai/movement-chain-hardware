@@ -1,0 +1,32 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🔍 Running pre-commit checks for hardware..."
+
+# Check for large binary files (> 10MB)
+echo "Checking for large files..."
+LARGE_FILES=$(find . -type f -size +10M 2>/dev/null | grep -v ".git" | grep -v "node_modules" || true)
+if [ ! -z "$LARGE_FILES" ]; then
+  echo "⚠️  Warning: Large files detected (non-blocking):"
+  echo "$LARGE_FILES"
+else
+  echo "✅ No large files found"
+fi
+
+# Validate KiCad project files exist
+if ls *.kicad_pro 1> /dev/null 2>&1; then
+  echo "✅ KiCad project file found"
+else
+  echo "⚠️  No KiCad project file found"
+fi
+
+# Check for backup files that shouldn't be committed
+BACKUP_FILES=$(find . -name "*-bak" -o -name "*.bak" -o -name "*~" 2>/dev/null | grep -v ".git" || true)
+if [ ! -z "$BACKUP_FILES" ]; then
+  echo "⚠️  Warning: Backup files found (should these be committed?):"
+  echo "$BACKUP_FILES"
+else
+  echo "✅ No backup files found"
+fi
+
+echo "✅ Pre-commit checks completed"
