@@ -1,6 +1,0 @@
-# IMU Recording (MPU6050) - Movement Chain
-# Start time: 2026-01-11T18:53:10.241133
-# Sample rate: 100 Hz
-# Port: /dev/cu.Bluetooth-Incoming-Port
-#
-timestamp,AcX,AcY,AcZ,GyX,GyY,GyZ,Tmp

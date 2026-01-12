@@ -1,154 +1,103 @@
 # Movement Chain Hardware
 
-KiCad PCB design repository for Movement Chain hardware components.
-
-## Overview
-
-This repository contains the hardware design files for Movement Chain's PCB using KiCad 7+.
+Hardware components for Movement Chain golf swing analyzer: firmware, PCB designs, and sensor tools.
 
 ## Repository Structure
 
 ```
 movement-chain-hardware/
-├── .github/
-│   └── workflows/
-│       └── pr-validation.yml    # Automated PR validation
-├── .husky/
-│   ├── commit-msg               # Commit message validation
-│   ├── pre-commit               # Pre-commit checks
-│   └── pre-push                 # Pre-push hardware validation
-├── *.kicad_pro                  # KiCad project file
-├── *.kicad_sch                  # Schematic files
-├── *.kicad_pcb                  # PCB layout files
-├── BOM.*                        # Bill of Materials
-├── commitlint.config.js         # Commit message rules
-├── package.json                 # Node.js dependencies
-├── HOOKS_SETUP.md              # Detailed setup guide
-└── README.md                    # This file
+├── firmware/                    # Arduino/ESP32 firmware
+│   ├── emg_sensor/             # EMG sensor (1000 Hz)
+│   ├── imu_mpu6050/            # MPU6050 IMU (100 Hz)
+│   └── i2c_scanner/            # I2C diagnostic tool
+├── tools/                       # Python recording & analysis
+│   ├── record_emg.py           # EMG data recorder
+│   ├── record_imu.py           # IMU data recorder
+│   ├── analyze_emg.py          # Signal processing
+│   └── requirements.txt
+├── pcb/                         # KiCad PCB designs (future)
+└── docs/                        # Documentation
+    └── sensor-recording.md     # Sensor recording guide
 ```
 
 ## Quick Start
 
-### 1. Clone Repository
+### 1. Install Python Dependencies
 
 ```bash
-git clone <repository-url>
-cd movement-chain-hardware
+cd tools
+pip3 install --user --break-system-packages -r requirements.txt
 ```
 
-### 2. Install Dependencies
+### 2. Upload Arduino Firmware
+
+1. Open Arduino IDE
+2. Open firmware (e.g., `firmware/emg_sensor/emg_sensor.ino`)
+3. Select Board: Arduino Uno
+4. Select Port
+5. Click Upload
+
+### 3. Record Sensor Data
 
 ```bash
-npm install
+# EMG recording (1000 Hz)
+python3 tools/record_emg.py
+
+# IMU recording (100 Hz)
+python3 tools/record_imu.py
 ```
 
-This will automatically set up Git hooks for commit validation and hardware checks.
+- Press **ENTER** to start recording
+- Press **Ctrl+C** to stop and save
 
-### 3. Install KiCad (Optional but Recommended)
+## Hardware Setup
 
-- **macOS**: `brew install kicad`
-- **Ubuntu/Debian**: `sudo apt-get install kicad`
-- **Windows**: Download from [kicad.org](https://www.kicad.org/download/)
+### EMG Sensor
 
-### 4. Open Project in KiCad
-
-```bash
-# Open the .kicad_pro file in KiCad
-open *.kicad_pro  # macOS
+```
+EMG Sensor          Arduino Uno
+┌─────────┐        ┌───────────┐
+│  + VCC  │───────→│    5V     │
+│  - GND  │───────→│    GND    │
+│  S SIG  │───────→│    A0     │
+└─────────┘        └───────────┘
 ```
 
-## Development Workflow
+### IMU (MPU6050)
 
-### Making Changes
-
-1. Create a feature branch:
-   ```bash
-   git checkout -b feature/my-hardware-change
-   ```
-
-2. Make changes in KiCad (schematic or PCB)
-
-3. Commit with conventional format:
-   ```bash
-   git commit -m "pcb: add decoupling capacitors near IC"
-   ```
-
-4. Push changes:
-   ```bash
-   git push origin feature/my-hardware-change
-   ```
-
-5. Create a Pull Request on GitHub
-
-### Commit Message Format
-
-Use [Conventional Commits](https://www.conventionalcommits.org/) with hardware-specific types:
-
-**Standard Types**:
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation
-- `chore`: Maintenance
-
-**Hardware Types**:
-- `hw`: General hardware changes
-- `pcb`: PCB layout changes
-- `sch`: Schematic changes
-- `bom`: Bill of Materials updates
-- `lib`: Component library updates
-
-**Examples**:
-```bash
-git commit -m "sch: add USB-C power delivery circuit"
-git commit -m "pcb: update trace widths for high-current paths"
-git commit -m "bom: update capacitor values"
-git commit -m "fix: correct footprint assignment for U1"
 ```
-
-## Git Hooks
-
-This repository uses automated Git hooks:
-
-- **commit-msg**: Validates commit message format
-- **pre-commit**: Checks for large files and backup files
-- **pre-push**: Runs KiCad ERC/DRC checks (if KiCad CLI is installed)
-
-All checks are non-blocking to avoid interrupting your workflow.
-
-## GitHub Actions
-
-Pull requests trigger automated validation:
-
-1. **ERC (Electrical Rule Check)**: Validates schematics
-2. **DRC (Design Rule Check)**: Validates PCB layout
-3. **Gerber Export**: Generates manufacturing files
-4. **BOM Export**: Generates Bill of Materials
-
-Artifacts (Gerbers and BOM) are available for download from the PR page for 7 days.
-
-## Prerequisites
-
-- **Node.js**: v18+ (for commit hooks)
-- **KiCad**: 7+ (for design and validation)
-- **Git**: 2.9+
+MPU6050             Arduino Uno
+┌─────────┐        ┌───────────┐
+│   VCC   │───────→│    5V     │
+│   GND   │───────→│    GND    │
+│   SDA   │───────→│    A4     │
+│   SCL   │───────→│    A5     │
+└─────────┘        └───────────┘
+```
 
 ## Documentation
 
-- [HOOKS_SETUP.md](HOOKS_SETUP.md) - Detailed Git hooks and workflow guide
-- [KiCad Documentation](https://docs.kicad.org/)
+- [Sensor Recording Guide](docs/sensor-recording.md) - Detailed recording instructions
 
-## Support
+## Commit Message Format
 
-For questions or issues:
-1. Check [HOOKS_SETUP.md](HOOKS_SETUP.md)
-2. Review GitHub Actions logs
-3. Create an issue in this repository
+Use [Conventional Commits](https://www.conventionalcommits.org/):
+
+| Type | Description |
+|------|-------------|
+| `feat` | New feature |
+| `fix` | Bug fix |
+| `docs` | Documentation |
+| `fw` | Firmware changes |
+| `pcb` | PCB layout changes |
+| `sch` | Schematic changes |
+| `bom` | Bill of Materials |
 
 ## License
 
-[Specify your license here]
+MIT License - see [LICENSE](LICENSE)
 
 ---
 
-**Project**: Movement Chain Hardware
-**Last Updated**: December 2025
+**Project**: Movement Chain
+**Last Updated**: January 2026

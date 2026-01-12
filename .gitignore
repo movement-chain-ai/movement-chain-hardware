@@ -67,3 +67,7 @@ venv/
 # Documentation builds
 docs/_build/
 site/
+
+# Sensor data recordings
+*.csv
+data/
