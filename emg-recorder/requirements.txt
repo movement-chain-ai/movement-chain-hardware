@@ -1,0 +1,13 @@
+# EMG Recorder - Dependencies
+# Install with: pip3 install --user --break-system-packages -r requirements.txt
+
+# Serial communication
+pyserial>=3.5
+
+# Signal processing and analysis
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.10.0
+
+# Visualization (optional, for analyze_emg.py)
+matplotlib>=3.7.0

@@ -1,0 +1,6 @@
+# IMU Recording (MPU6050) - Movement Chain
+# Start time: 2026-01-11T18:55:18.490880
+# Sample rate: 100 Hz
+# Port: /dev/cu.usbmodem3101
+#
+timestamp,AcX,AcY,AcZ,GyX,GyY,GyZ,Tmp
